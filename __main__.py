@@ -2,7 +2,7 @@ import email
 from email import policy
 from email.parser import BytesParser
 from email.utils import parsedate_to_datetime
-
+from email.utils import parseaddr
 
 # Acessar .mbox pelo google takeout
 
@@ -18,12 +18,28 @@ INTEREST_TRANSLATE = {
     "inva": "INVA"
 }
 
+def extract_recipient_name(to_header: str):
+    """
+    Returns (name, email) from a 'To' header.
+    If no name is present, name will be None.
+    """
+    if not to_header:
+        return None, None
+
+    name, email = parseaddr(to_header)
+
+    # Normalize empty names
+    if name == "":
+        name = None
+
+    return name, email
+
 def email_info_to_csv(info_list):
     csv_text = "data,mes,nome,telefone,email,interesse\n"
     for info in info_list:
         date = format_email_date(info['date'])
         month = ""
-        name = ""
+        name = info["to_name"]
         phone = ""
         mail = info["to"]
 
@@ -35,7 +51,7 @@ def email_info_to_csv(info_list):
             if info['body_keyword_flags'][bs]:
                 interest += INTEREST_TRANSLATE[bs] + " "
 
-        csv_text += f"{date},,,,{mail},{interest}\n"
+        csv_text += f"{date},{month},{name},{phone},{mail},{interest}\n"
     
 
     with open("out.csv", "w") as file:
@@ -69,7 +85,8 @@ def extract_email_info(raw_email: str, subject_keywords=None, body_keywords=None
     msg = email.message_from_string(raw_email, policy=policy.default)
 
     # Extract simple fields
-    recipient = msg.get("To")
+    raw_to = msg.get("To", "")
+    to_name, to_email = parseaddr(raw_to)
     subject   = msg.get("Subject", "")
     date      = msg.get("Date")
 
@@ -98,7 +115,8 @@ def extract_email_info(raw_email: str, subject_keywords=None, body_keywords=None
     }
 
     return {
-        "to": recipient,
+        "to": to_email,
+        "to_name": to_name,
         "date": date,
         "subject_keyword_flags": subject_flags,
         "body_keyword_flags": body_flags,
