@@ -3,6 +3,9 @@ from email import policy
 from email.parser import BytesParser
 from email.utils import parsedate_to_datetime
 
+
+# Acessar .mbox pelo google takeout
+
 IN_FILE = "in.mbox"
 TITLE_SEARCH = ["Informações do curso"]
 BODY_SEARCH = ["piloto privado", "pp", "piloto comercial", "pc", "instrutor de voo", "inva"]
