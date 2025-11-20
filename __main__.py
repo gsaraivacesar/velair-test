@@ -32,8 +32,11 @@ def email_info_to_csv(info_list):
             if info['body_keyword_flags'][bs]:
                 interest += INTEREST_TRANSLATE[bs] + " "
 
-        csv_text += f"{date},,,,{mail},{interest}"
+        csv_text += f"{date},,,,{mail},{interest}\n"
+    
 
+    with open("out.csv", "w") as file:
+        file.write(csv_text)
     return csv_text
 
         
