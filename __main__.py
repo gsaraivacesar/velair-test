@@ -40,7 +40,7 @@ def email_info_to_csv(info_list):
         date = format_email_date(info['date'])
         month = ""
         name = info["to_name"]
-        phone = ""
+        phone = info["phone"]
         mail = info["to"]
 
         if info['subject_keyword_flags'][TITLE_SEARCH[0]] == False: continue
@@ -120,6 +120,7 @@ def extract_email_info(raw_email: str, subject_keywords=None, body_keywords=None
         "date": date,
         "subject_keyword_flags": subject_flags,
         "body_keyword_flags": body_flags,
+        "phone": ""
     }
 
 def split_mbox_emails(mbox_string: str):
